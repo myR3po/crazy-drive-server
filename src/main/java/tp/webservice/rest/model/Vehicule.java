@@ -7,12 +7,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(propOrder = {"x","y","theta","vitesse"})
 public class Vehicule {
 
-	static final double ROTATION = 5.0 ;
-	static final double ACCELERATION = 2 ;
-	static final double DESCELERATION = 1 ;
+  private static final double ROTATION = 5.0 ;
+  private static final double ACCELERATION = 2 ;
+  private static final double DESCELERATION = 1 ;
 	
-	private int x, y;
-	double vitesse, theta;
+	private int x;
+	private int y;
+	private double vitesse;
+	private double theta;
 	
 	public Vehicule(){
 		
@@ -23,49 +25,6 @@ public class Vehicule {
 		y=y0; 
 		theta=r0;
 		vitesse = r0 ;
-	}
-	
-	//@XmlElement
-	public int getX() {
-		return x;
-	}
-
-
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-
-	//@XmlElement
-	public int getY() {
-		return y;
-	}
-
-
-
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	//@XmlElement
-	public double getVitesse() {
-		return vitesse;
-	}
-
-	public void setVitesse(double vitesse) {
-		this.vitesse = vitesse;
-	}
-
-	//@XmlElement
-	public double getTheta() {
-		return theta;
-	}
-
-
-
-	public void setTheta(double theta) {
-		this.theta = theta;
 	}
 
 	public void tournerGauche(){
@@ -107,14 +66,45 @@ public class Vehicule {
 		y += Math.sin(arg) * vitesse ;
 		
 	}
-	
-	@Override
+
+  public int getX() {
+    return x;
+  }
+
+  public void setX(int x) {
+    this.x = x;
+  }
+
+  public int getY() {
+    return y;
+  }
+
+  public void setY(int y) {
+    this.y = y;
+  }
+
+  public double getVitesse() {
+    return vitesse;
+  }
+
+  public void setVitesse(double vitesse) {
+    this.vitesse = vitesse;
+  }
+
+  public double getTheta() {
+    return theta;
+  }
+
+  public void setTheta(double theta) {
+    this.theta = theta;
+  }
+
+  @Override
 	public String toString() {
 		return new StringBuffer(" x : ").append(this.getX())
 				.append(" y : ").append(this.getY())
 				.append(" angle : ").append(this.getTheta()).append(" vitesse : ")
 				.append(this.getVitesse()).toString();
 	}
-
 
 }
