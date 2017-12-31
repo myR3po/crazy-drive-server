@@ -16,10 +16,13 @@ import tp.webservice.rest.model.Vehicule;
 public class CrazyDrive {
 	public static int nombrePlayer = 0;
 	public String id=null;
+
 	public static HashMap<String, Vehicule> vehicules = new HashMap<String, Vehicule>();
 	public Vehicule v;
 	
-	
+	public CrazyDrive(){
+	}
+
 	@GET
 	@Path("/creation")
 	public Response newPlayer(@PathParam("creation") String msg){
@@ -45,9 +48,8 @@ public class CrazyDrive {
 	public Response out(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
 		nombrePlayer--;
-		if(identifiant != null){
-			vehicules.remove(identifiant);
-		}
+		vehicules.remove(identifiant);
+	
 		return Response.status(200).entity(""+id).build();
 	}
 	
@@ -56,14 +58,9 @@ public class CrazyDrive {
 	@Path("/text/{id}/up")
 	public Response Avancer( @PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		String output = null;
-		if(identifiant != null){
-			Vehicule v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.avancer();
-				output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.avancer();
+		String output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
 		return Response.status(200).entity(output).build();
 	}
 	
@@ -72,14 +69,10 @@ public class CrazyDrive {
 	@Path("/text/{id}/left")
 	public Response tournerGauche(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		String output = null;
-		if(identifiant != null){
-			Vehicule v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.tournerGauche();
-				output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.tournerGauche();
+		
+		String output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
 		return Response.status(200).entity(output).build();
 		
 	}
@@ -89,14 +82,10 @@ public class CrazyDrive {
 	@Path("/text/{id}/right")
 	public Response tournerDroite(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		String output = null;
-		if(identifiant != null){
-			Vehicule v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.tournerDroite();
-				output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.tournerDroite();
+		
+		String output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
 		return Response.status(200).entity(output).build();
 	}
 	
@@ -105,14 +94,9 @@ public class CrazyDrive {
 	@Path("/text/{id}/down")
 	public Response reculer(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		String output = null;
-		if(identifiant != null){
-			Vehicule v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.reculer();
-				output =  "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.reculer();
+		String output =  "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
 		return Response.status(200).entity(output).build();
 		
 	}
@@ -122,14 +106,9 @@ public class CrazyDrive {
 	@Path("/text/{id}/notouch")
 	public Response roueLibre(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		String output = null;
-		if(identifiant != null){
-			Vehicule v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.roueLibre();
-				output =  "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.roueLibre();
+		String output =  "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
 		return Response.status(200).entity(output).build();
 	}
 	
@@ -141,16 +120,12 @@ public class CrazyDrive {
 		String output= "";
 		
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		
-		if(identifiant != null){
-		
-			int i=0;
-			for(String key : vehicules.keySet()){
-				if (!key.equalsIgnoreCase(identifiant)){
-					Vehicule v = (Vehicule) vehicules.get(key);
-					i++;
-					output += "Voiture_"+i+";angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse()+",\n";
-				}
+		int i=0;
+		for(String key : vehicules.keySet()){
+			if (!key.equalsIgnoreCase(identifiant)){
+				Vehicule v = (Vehicule) vehicules.get(key);
+				i++;
+				output += "Voiture_"+i+";angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse()+",\n";
 			}
 		}
 		return Response.status(200).entity(output).build();
@@ -177,13 +152,8 @@ public class CrazyDrive {
 	@Path("/json/{id}/up")
 	public Vehicule jsonAvancer( @PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.avancer();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.avancer();
 		
 		return v;
 	}
@@ -193,13 +163,9 @@ public class CrazyDrive {
 	@Path("/json/{id}/left")
 	public Vehicule jsonTournerGauche(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.tournerGauche();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.tournerGauche();
+		
 		return v;
 		
 	}
@@ -209,13 +175,9 @@ public class CrazyDrive {
 	@Path("/json/{id}/right")
 	public Vehicule jsonTournerDroite(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.tournerDroite();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.tournerDroite();
+		
 		return v;
 	}
 	
@@ -224,13 +186,9 @@ public class CrazyDrive {
 	@Path("/json/{id}/down")
 	public Vehicule jsonReculer(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.reculer();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.reculer();
+		
 		return v;
 		
 	}
@@ -240,13 +198,8 @@ public class CrazyDrive {
 	@Path("/json/{id}/notouch")
 	public Vehicule jsonRoueLibre(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.roueLibre();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.roueLibre();
 		return v;
 	}
 	
@@ -257,8 +210,7 @@ public class CrazyDrive {
 		
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg.toUpperCase() : null;
 		Cars c = new Cars();
-		
-		if(identifiant!= null && !identifiant.isEmpty() && vehicules.containsKey(identifiant)){
+		if(!identifiant.isEmpty() && vehicules.containsKey(identifiant)){
 
 			for(String key : vehicules.keySet()){
 				if (!key.equalsIgnoreCase(identifiant)){
@@ -290,13 +242,9 @@ public class CrazyDrive {
 	@Path("/xml/{id}/up")
 	public Vehicule xmlAvancer( @PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.avancer();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.avancer();
+		
 		return v;
 	}
 	
@@ -305,14 +253,11 @@ public class CrazyDrive {
 	@Path("/xml/{id}/left")
 	public Vehicule xmlTournerGauche(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.tournerGauche();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.tournerGauche();
+		
 		return v;
+		
 	}
 	
 	@GET
@@ -320,13 +265,9 @@ public class CrazyDrive {
 	@Path("/xml/{id}/right")
 	public Vehicule xmlTournerDroite(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.tournerDroite();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.tournerDroite();
+		
 		return v;
 	}
 	
@@ -335,14 +276,11 @@ public class CrazyDrive {
 	@Path("/xml/{id}/down")
 	public Vehicule xmlReculer(@PathParam("id") String msg){
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = null;
-		if(identifiant != null){
-			v = (Vehicule) vehicules.get(identifiant);
-			if(v!=null){
-				v.reculer();
-			}
-		}
+		Vehicule v = (Vehicule) vehicules.get(identifiant);
+		v.reculer();
+		
 		return v;
+		
 	}
 
 	@GET
@@ -362,7 +300,7 @@ public class CrazyDrive {
 		
 		String identifiant = msg.matches("^\\p{Alnum}+$")? msg.toUpperCase() : null;
 		Cars c = new Cars();
-		if(identifiant!= null &&!identifiant.isEmpty() && vehicules.containsKey(identifiant)){
+		if(!identifiant.isEmpty() && vehicules.containsKey(identifiant)){
 
 			for(String key : vehicules.keySet()){
 				if (!key.equalsIgnoreCase(identifiant)){
