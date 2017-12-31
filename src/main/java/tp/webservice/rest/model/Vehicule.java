@@ -101,9 +101,9 @@ public class Vehicule {
 
   @Override
 	public String toString() {
-		return new StringBuffer(" x : ").append(this.getX())
-				.append(" y : ").append(this.getY())
-				.append(" angle : ").append(this.getTheta()).append(" vitesse : ")
+		return new StringBuffer("x:").append(this.getX())
+				.append(",y:").append(this.getY())
+				.append(",angle:").append(this.getTheta()).append(",vitesse:")
 				.append(this.getVitesse()).toString();
 	}
 

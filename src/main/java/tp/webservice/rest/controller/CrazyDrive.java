@@ -12,319 +12,218 @@ import javax.ws.rs.core.Response;
 import tp.webservice.rest.model.Cars;
 import tp.webservice.rest.model.Vehicule;
 
-@Path("/server")
 public class CrazyDrive {
-	public static int nombrePlayer = 0;
-	public String id=null;
+  public static HashMap<String, Vehicule> vehicules = new HashMap<String, Vehicule>();
 
-	public static HashMap<String, Vehicule> vehicules = new HashMap<String, Vehicule>();
-	public Vehicule v;
-	
-	public CrazyDrive(){
-	}
+  public CrazyDrive() {
+  }
 
-	@GET
-	@Path("/creation")
-	public Response newPlayer(@PathParam("creation") String msg){
-		nombrePlayer++;
-		id=getId();
-		v = new Vehicule(0,0,0,0);
-		vehicules.put(id, v);
-		
-		return Response.status(200).entity(""+id).build();
-	}
-	
-	private String getId(){
-		String token=null;
-		do{
-			token = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-		}while(vehicules.containsKey(token));
-		
-		return token;
-	}
+  private Vehicule getVehicule(String msg) {
+    String identifiant = msg.matches("^\\p{Alnum}+$") ? msg : null;
+    return vehicules.get(identifiant);
+  }
 
-	@GET
-	@Path("/{id}/quit")
-	public Response out(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		nombrePlayer--;
-		vehicules.remove(identifiant);
-	
-		return Response.status(200).entity(""+id).build();
-	}
-	
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/{id}/up")
-	public Response Avancer( @PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.avancer();
-		String output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-		return Response.status(200).entity(output).build();
-	}
-	
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/{id}/left")
-	public Response tournerGauche(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.tournerGauche();
-		
-		String output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-		return Response.status(200).entity(output).build();
-		
-	}
-	
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/{id}/right")
-	public Response tournerDroite(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.tournerDroite();
-		
-		String output = "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-		return Response.status(200).entity(output).build();
-	}
-	
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/{id}/down")
-	public Response reculer(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.reculer();
-		String output =  "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-		return Response.status(200).entity(output).build();
-		
-	}
+  @GET
+  @Path("/vehicule/join")
+  public Response newPlayer(@PathParam("creation") String msg) {
+    String id = getId();
+    vehicules.put(id, new Vehicule(0, 0, 0, 0));
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/{id}/notouch")
-	public Response roueLibre(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.roueLibre();
-		String output =  "angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse();
-		return Response.status(200).entity(output).build();
-	}
-	
-	
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/{id}/other")
-	public Response other(@PathParam("id") String msg){
-		String output= "";
-		
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		int i=0;
-		for(String key : vehicules.keySet()){
-			if (!key.equalsIgnoreCase(identifiant)){
-				Vehicule v = (Vehicule) vehicules.get(key);
-				i++;
-				output += "Voiture_"+i+";angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse()+",\n";
-			}
-		}
-		return Response.status(200).entity(output).build();
-	}
-	
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/text/cars")
-	public Response others(@PathParam("id") String msg){
-		String output= "";
-		
-		int i=0;
-		for(String key : vehicules.keySet()){
-				Vehicule v = (Vehicule) vehicules.get(key);
-				i++;
-				output += "Voiture_"+i+";angle:"+ v.getTheta() + ",X:"+ v.getX()+ ",Y:"+v.getY() + ",vitesse:"+v.getVitesse()+",\n";
-		}
-		return Response.status(200).entity(output).build();
-	}
-	
-/****************************************JSON*********************************/
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/{id}/up")
-	public Vehicule jsonAvancer( @PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.avancer();
-		
-		return v;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/{id}/left")
-	public Vehicule jsonTournerGauche(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.tournerGauche();
-		
-		return v;
-		
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/{id}/right")
-	public Vehicule jsonTournerDroite(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.tournerDroite();
-		
-		return v;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/{id}/down")
-	public Vehicule jsonReculer(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.reculer();
-		
-		return v;
-		
-	}
+    return Response.status(200).entity("" + id).build();
+  }
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/{id}/notouch")
-	public Vehicule jsonRoueLibre(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.roueLibre();
-		return v;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/{id}/other")
-	public Cars jsonOther(@PathParam("id") String msg){
-		
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg.toUpperCase() : null;
-		Cars c = new Cars();
-		if(!identifiant.isEmpty() && vehicules.containsKey(identifiant)){
+  private String getId() {
+    String token = null;
+    do {
+      token = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+    } while (vehicules.containsKey(token));
 
-			for(String key : vehicules.keySet()){
-				if (!key.equalsIgnoreCase(identifiant)){
-					
-					c.addEntry( (Vehicule) vehicules.get(key));
-				}
-			}
-		}
-		return c;
-	}
+    return token;
+  }
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/json/cars")
-	public Cars jsonOthers(@PathParam("id") String msg){
-		Cars c = new Cars();
+  @GET
+  @Path("/vehicule/{id}/quit")
+  public Response out(@PathParam("id") String msg) {
+    String identifiant = msg.matches("^\\p{Alnum}+$") ? msg : null;
+    vehicules.remove(identifiant);
 
-		for(String key : vehicules.keySet()){
-					
-			c.addEntry( (Vehicule) vehicules.get(key));
-			
-		}
-		return c;
-	}
+    return Response.status(200).build();
+  }
 
-	/************************************XML*****************************/
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/{id}/up")
-	public Vehicule xmlAvancer( @PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.avancer();
-		
-		return v;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/{id}/left")
-	public Vehicule xmlTournerGauche(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.tournerGauche();
-		
-		return v;
-		
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/{id}/right")
-	public Vehicule xmlTournerDroite(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.tournerDroite();
-		
-		return v;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/{id}/down")
-	public Vehicule xmlReculer(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.reculer();
-		
-		return v;
-		
-	}
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicule/text/{id}/front")
+  public Response Avancer(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.avancer();
+      return Response.status(200).entity(v.toString()).build();
+    }
+    return Response.status(404).build();
+  }
 
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/{id}/notouch")
-	public Vehicule xmlRoueLibre(@PathParam("id") String msg){
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg : null;
-		Vehicule v = (Vehicule) vehicules.get(identifiant);
-		v.roueLibre();
-		return v;
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/{id}/other")
-	public Cars xmlOther(@PathParam("id") String msg){
-		
-		String identifiant = msg.matches("^\\p{Alnum}+$")? msg.toUpperCase() : null;
-		Cars c = new Cars();
-		if(!identifiant.isEmpty() && vehicules.containsKey(identifiant)){
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicule/text/{id}/left")
+  public Response tournerGauche(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.tournerGauche();
+      return Response.status(200).entity(v.toString()).build();
+    }
+    return Response.status(404).build();
+  }
 
-			for(String key : vehicules.keySet()){
-				if (!key.equalsIgnoreCase(identifiant)){
-					
-					c.addEntry( (Vehicule) vehicules.get(key));
-				}
-			}
-		}
-		return c;
-		
-	}
-	
-	@GET
-	@Produces(MediaType.APPLICATION_XML)
-	@Path("/xml/cars")
-	public Cars xmlOthers(@PathParam("id") String msg){
-		Cars c = new Cars();
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicule/text/{id}/right")
+  public Response tournerDroite(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.tournerDroite();
+      return Response.status(200).entity(v.toString()).build();
+    }
+    return Response.status(404).build();
+  }
 
-		for(String key : vehicules.keySet()){
-					
-			c.addEntry( (Vehicule) vehicules.get(key));
-			
-		}
-		return c;
-	}
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicule/text/{id}/back")
+  public Response reculer(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.reculer();
+      return Response.status(200).entity(v.toString()).build();
+    }
+    return Response.status(404).build();
+  }
 
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicule/text/{id}/none")
+  public Response roueLibre(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.roueLibre();
+      return Response.status(200).entity(v.toString()).build();
+    }
+    return Response.status(404).build();
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicule/text/{id}/opponents")
+  public Response other(@PathParam("id") String msg) {
+    String output = "";
+
+    String identifiant = msg.matches("^\\p{Alnum}+$") ? msg : null;
+    int i = 0;
+    for (String key : vehicules.keySet()) {
+      if (!key.equalsIgnoreCase(identifiant)) {
+        Vehicule v = (Vehicule) vehicules.get(key);
+        i++;
+        output += "Voiture_" + i + v.toString() + ",\n";
+      }
+    }
+    return Response.status(200).entity(output).build();
+  }
+
+  @GET
+  @Produces(MediaType.TEXT_PLAIN)
+  @Path("/vehicules/text/all")
+  public Response others(@PathParam("id") String msg) {
+    String output = "";
+
+    int i = 0;
+    for (String key : vehicules.keySet()) {
+      Vehicule v = (Vehicule) vehicules.get(key);
+      i++;
+      output += "Voiture_" + i + v.toString() + ",\n";
+    }
+    return Response.status(200).entity(output).build();
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicule/{id}/front")
+  public Vehicule jsonAvancer(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.avancer();
+    }
+    return v;
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicule/{id}/left")
+  public Vehicule jsonTournerGauche(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.tournerGauche();
+    }
+    return v;
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicule/{id}/right")
+  public Vehicule jsonTournerDroite(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.tournerDroite();
+    }
+    return v;
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicule/{id}/back")
+  public Vehicule jsonReculer(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.reculer();
+    }
+    return v;
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicule/{id}/none")
+  public Vehicule jsonRoueLibre(@PathParam("id") String msg) {
+    Vehicule v = getVehicule(msg);
+    if (v != null) {
+      v.roueLibre();
+    }
+    return v;
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicule/{id}/opponents")
+  public Cars jsonOther(@PathParam("id") String msg) {
+
+    String identifiant = msg.matches("^\\p{Alnum}+$") ? msg.toUpperCase() : null;
+    Cars c = new Cars();
+    if (!identifiant.isEmpty() && vehicules.containsKey(identifiant)) {
+
+      for (String key : vehicules.keySet()) {
+        if (!key.equalsIgnoreCase(identifiant)) {
+          c.addEntry((Vehicule) vehicules.get(key));
+        }
+      }
+    }
+    return c;
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/vehicules/all")
+  public Cars jsonAll(@PathParam("id") String msg) {
+    Cars c = new Cars();
+    for (String key : vehicules.keySet()) {
+      c.addEntry((Vehicule) vehicules.get(key));
+    }
+    return c;
+  }
 }
